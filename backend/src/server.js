@@ -12,9 +12,17 @@ const exchangeRateRoutes = require('./routes/exchangeRate');
 
 const app = express();
 const server = http.createServer(app);
+
+// Allow multiple origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://travel-liard-iota.vercel.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true
   }
@@ -22,7 +30,7 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -50,6 +58,11 @@ app.use('/api/couple', coupleRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/exchange-rates', exchangeRateRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Test route
 app.get('/', (req, res) => {
