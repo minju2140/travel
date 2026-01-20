@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이콘 생성기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+        button {
+            background: #14b8a6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0d9488;
+        }
+    </style>
+</head>
+<body>
+    <h1>앱 아이콘 생성기</h1>
+    <p>아래 버튼을 클릭하면 아이콘이 자동으로 다운로드됩니다.</p>
+    
+    <canvas id="canvas192" width="192" height="192"></canvas>
+    <canvas id="canvas512" width="512" height="512"></canvas>
+    
+    <div>
+        <button onclick="generateIcons()">아이콘 생성 및 다운로드</button>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: left; background: #f0f0f0; padding: 20px; border-radius: 8px;">
+        <h3>생성 후 할 일:</h3>
+        <ol>
+            <li>다운로드된 <code>icon-192.png</code>와 <code>icon-512.png</code>를<br>
+                <code>couple-trip-expense/frontend/public/</code> 폴더에 저장</li>
+            <li>브라우저 새로고침</li>
+            <li>모바일에서 "홈 화면에 추가" 가능!</li>
+        </ol>
+    </div>
+
+    <script>
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#14b8a6');
+            gradient.addColorStop(1, '#f43f5e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw heart
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const heartSize = size * 0.4;
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            
+            const topCurveHeight = heartSize * 0.3;
+            ctx.moveTo(centerX, centerY + topCurveHeight);
+            
+            // Left side
+            ctx.bezierCurveTo(
+                centerX, centerY - topCurveHeight,
+                centerX - heartSize / 2, centerY - topCurveHeight,
+                centerX - heartSize / 2, centerY + topCurveHeight * 0.5
+            );
+            
+            ctx.bezierCurveTo(
+                centerX - heartSize / 2, centerY + heartSize / 2,
+                centerX, centerY + heartSize * 0.7,
+                centerX, centerY + heartSize
+            );
+            
+            // Right side
+            ctx.bezierCurveTo(
+                centerX, centerY + heartSize * 0.7,
+                centerX + heartSize / 2, centerY + heartSize / 2,
+                centerX + heartSize / 2, centerY + topCurveHeight * 0.5
+            );
+            
+            ctx.bezierCurveTo(
+                centerX + heartSize / 2, centerY - topCurveHeight,
+                centerX, centerY - topCurveHeight,
+                centerX, centerY + topCurveHeight
+            );
+            
+            ctx.fill();
+            
+            // Add currency symbol
+            ctx.font = `bold ${size * 0.2}px Arial`;
+            ctx.fillStyle = '#14b8a6';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('₩', centerX, centerY + topCurveHeight * 0.3);
+        }
+        
+        function generateIcons() {
+            const canvas192 = document.getElementById('canvas192');
+            const canvas512 = document.getElementById('canvas512');
+            
+            drawIcon(canvas192);
+            drawIcon(canvas512);
+            
+            // Download 192x192
+            canvas192.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'icon-192.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+            
+            // Download 512x512
+            setTimeout(() => {
+                canvas512.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'icon-512.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }, 500);
+            
+            alert('아이콘이 다운로드되었습니다!\n파일을 frontend/public/ 폴더에 저장하세요.');
+        }
+        
+        // Generate on load
+        window.onload = () => {
+            drawIcon(document.getElementById('canvas192'));
+            drawIcon(document.getElementById('canvas512'));
+        };
+    </script>
+</body>
+</html>

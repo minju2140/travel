@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.db
+*.db-journal
+prisma/migrations/*
+!prisma/migrations/.gitkeep
+dist/
+.DS_Store
